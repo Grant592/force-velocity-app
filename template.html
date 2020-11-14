@@ -1,0 +1,37 @@
+<html>
+<head>
+    <style>
+        * {
+            font-family: sans-serif;
+        }
+        body {
+            padding: 20px;
+        }
+        table {
+            border-collapse: collapse;
+            text-align: right;
+        }
+        table tr {
+            border-bottom: 1px solid
+        }
+        table th, table td {
+            padding: 10px 20px;
+        }
+        img {
+            width: 90%;
+        }
+    </style> 
+</head>
+<body>
+
+<h1>Force Velocity Profiling for {{ player_name }}</h1>
+
+{{ data }}
+    
+{% for plot in plots %}
+
+<img src='{{plot}}.png' width="600">
+
+{% endfor %}
+</body>
+</html>
