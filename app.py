@@ -23,7 +23,7 @@ def parse_csv(csv_file, filename):
     label = f'{name}-{date}'
     content_type, content_string = csv_file.split(",")
     decoded = base64.b64decode(content_string)
-    df = pd.read_csv(io.StringIO(decoded.decode('utf-8')), header=None, sep=";")
+    df = pd.read_csv(io.StringIO(decoded.decode('utf-8')),skiprows=1 , sep=";") #header=None
     name = " ".join([x.title() for x in name.split("_")])
     df.columns = ['time', 'data', 'vel', 'lat', 'long']
     fv = fvProfile(df, name, float(bw))
@@ -122,42 +122,36 @@ def create_dropdown(data):
         name, date = key.split("-")
         name = " ".join(name.split("_")).title()
         sprints = [sprint for sprint in data[key]['sprint_dict'].keys()]
-        print(sprints)
         for sprint in sprints:
             key_sprint = "-".join([key,sprint])
             options.append({'label':f'{name} {date} {sprint}', 'value':key_sprint})
     print(options)
     return options
 
-# Need to update the key value to reflect sprint data
-# Need to process the new key value in the following few callbacks
 
 @app.callback(
     Output('table1', 'children'),
     [Input('memory-store', 'data'),
     Input('dropdown-menu','value')])
 def update_datatable(data, keys):
-    tables = []
-    for i,key in enumerate(keys): # can add second key for sprint values
-        key_split = key.split('-')
-        key = "-".join(key_split[:2])
-        data_temp = data[key]['sprint_dict'] # this could look like data[key]['sprint_dict'][key2]
-        df = pd.DataFrame(data_temp).round(2).T
-        print(df)
-        table = dash_table.DataTable(id=f'table_{key}',
-                                     columns=[{"name":k,"id":k} for k in df.columns],
-                                     data=df.to_dict('record'))
-        key = key.split('-')
-        key = f"{key[0].replace('_', ' ').title()} - {key[1]}"
-        tables.append((key,table))
-
-    return [html.Div(
-        [
-            html.H5(key),
-            table
-        ]) for (key, table) in tables
-    ]
-
+    df_list = []
+    for key in data.keys():
+        _,date = key.split("-")
+        for sprint in data[key]['sprint_dict'].keys():
+            data[key]['sprint_dict'][sprint]['date'] = date  
+        dff = pd.DataFrame(data[key]['sprint_dict']).T.reset_index()
+        dff = dff.rename(columns={'index':'sprint_no'})
+        dff = dff[['name', 'date', 'sprint_no', 'bodyweight','F0', 'F0_kg','V0','Pmax', 'Pmax_kg', 'RF_max']].convert_dtypes()
+        for col in dff.columns:
+            if dff[col].dtype == 'float64':
+                dff[col] = dff[col].round(2)
+        df_list.append(dff)
+    df = pd.concat(df_list, ignore_index=True)
+    table = dash_table.DataTable(id='data-table',
+                                 columns=[{'name':k,'id':k} for k in df.columns],
+                                 data=df.to_dict('records'))
+    return [html.H4('Sprint Data'),
+            table]
 
 @app.callback(
     Output('force-speed-graph','figure'),

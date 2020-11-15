@@ -106,17 +106,17 @@ class fvProfile:
         sprint['PowerHzt_kg'] = sprint['Ftot_kg'] * sprint['predicted_velocity']
         sprint['Fres'] = np.sqrt(sprint['Fhzt']**2 + (self.bw * 9.81)**2)
         sprint['RF_perc'] = np.where(sprint['time'] < 0.3, 0, sprint['Fhzt']/sprint['Fres'])
-        sprint['name'] = self.name
-        sprint['self.bw'] = self.bw
+        sprint_data['name'] = self.name
+        sprint_data['bodyweight'] = self.bw
 
-        return sprint
+        return sprint, sprint_data
 
 
 
     def apply_calculations(self):
         """Pass each sprint and its associated parameters to the caluclate_data function"""
         for i, (sprint, sprint_data) in enumerate(zip(self.sprints, self.sprint_dict.keys())):
-            self.sprints[i] = self.calculate_data(sprint, self.sprint_dict[sprint_data])
+            self.sprints[i], self.sprint_dict[sprint_data] = self.calculate_data(sprint, self.sprint_dict[sprint_data])
 
 
 
