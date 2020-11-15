@@ -33,8 +33,8 @@ class fvProfile:
                   self.df['time'],
                   frac=span)
         self.df['smooth_velocity'] = smooth_velocity[:,1]
-        plt.plot(self.df['time'], self.df['vel'])
-        plt.plot(self.df['time'], self.df['smooth_velocity'])
+        #plt.plot(self.df['time'], self.df['vel'])
+        #plt.plot(self.df['time'], self.df['smooth_velocity'])
 
     def find_peaks(self, rel_height=0.4):
         """Using scipy signal module to find and extract peaks"""
@@ -199,7 +199,7 @@ class fvProfile:
         axes[1,1].set_xlabel("Velocity (m/s)")
         axes[1,1].set_ylabel("Ratio Force (%)", color=axcolor1)
 
-        plt.savefig(plot_name)
+        #plt.savefig(plot_name)
 
 
     def plot_multiple_plots(self):
