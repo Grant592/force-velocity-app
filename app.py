@@ -147,9 +147,29 @@ def update_datatable(data, keys):
                 dff[col] = dff[col].round(2)
         df_list.append(dff)
     df = pd.concat(df_list, ignore_index=True)
-    table = dash_table.DataTable(id='data-table',
-                                 columns=[{'name':k,'id':k} for k in df.columns],
-                                 data=df.to_dict('records'))
+    table = dash_table.DataTable(
+        id='data-table',
+        columns=[{'name':k,'id':k} for k in df.columns],
+        style_as_list_view=True,
+        style_cell={'padding':'5px'},
+        style_cell_conditional=[
+            {
+                'if': {'column_id':c},
+                'textAlign':'left',
+            } for c in ['name', 'date', 'sprint_no']
+        ],
+        style_data_conditional=[
+            {
+                'if': {'row_index':'odd'},
+                'backgroundColor':'rgb(248,248,248)'
+            }
+        ],
+        style_header={
+            'backgroundColor': 'rgb(230,230,230)',
+            'fontWeight': 'bold'
+        },
+        data=df.to_dict('records'))
+
     return [html.H4('Sprint Data'),
             table]
 
